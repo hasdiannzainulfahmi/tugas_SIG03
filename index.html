@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desa Beraim</title>
+    <link rel="stylesheet" href="assets/leaflet.css">
+    <script src="assets/leaflet.js"></script>
+    <script src="Beraim.geojson.js"></script> <!-- Pastikan file ini ada dan path benar -->
+    <script src="Beraim0.geojson.js"></script> <!-- Pastikan file ini ada dan path benar -->
+    <style>
+        body, html {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+        }
+        #map {
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <script>
+        const map = L.map('map').setView([-8.7111953, 116.3446173], 13);
+
+        // Tile layer peta jalanan (OpenStreetMap)
+        const osmLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap'
+        });
+
+        // Tile layer peta satelit (ESRI)
+        const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 19,
+            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+        });
+
+        // Menambahkan OSM sebagai layer default
+        osmLayer.addTo(map);
+
+        // Pastikan GeoJSON dimuat dengan benar dan tambahkan ke peta dengan gaya
+        var geojsonStyle = {
+            "color": "#ff7800",  // Warna batas desa
+            "weight": 2,         // Ketebalan garis batas
+            "opacity": 1         // Transparansi garis batas
+        };
+
+        // Layer batas desa
+        var BeraimBoundary = L.geoJSON(Beraim, {
+            style: geojsonStyle
+        }).addTo(map);
+
+        // Layer group dan fasilitas
+        const iconKantorDesa = L.icon({
+            iconUrl: 'assets/images/congress.png',
+            iconSize: [32, 32],
+            iconAnchor: [16, 32],
+            popupAnchor: [0, -32]
+        });
+
+        const iconPendidikan = L.icon({
+            iconUrl: 'assets/images/school.png',
+            iconSize: [32, 32],
+            iconAnchor: [16, 32],
+            popupAnchor: [0, -32]
+        });
+
+        const iconIbadah = L.icon({
+            iconUrl: 'assets/images/mosquee.png',
+            iconSize: [32, 32],
+            iconAnchor: [16, 32],
+            popupAnchor: [0, -32]
+        });
+
+        // Layer group Kantor Desa
+        var kantorDesaLayer = L.layerGroup();
+        var Kantor_Desa_Beraim = L.marker([-8.706475, 116.339405], {icon: iconKantorDesa})
+            .bindPopup("<b>Kantor Desa Beraim</b>")
+            .addTo(kantorDesaLayer);
+
+        // Layer group Fasilitas Pendidikan
+        var pendidikanLayer = L.layerGroup();
+        var SDN_dakung = L.marker([-8.709375, 116.339024], {icon: iconPendidikan})
+            .bindPopup("<b>SDN Dakung</b>")
+            .addTo(pendidikanLayer);
+        var SDN2_beraim = L.marker([-8.706967, 116.337908], {icon: iconPendidikan})
+            .bindPopup("<b>SDN 2 Beraim</b>")
+            .addTo(pendidikanLayer);
+        var SDN3_beraim = L.marker([-8.703945, 116.339083], {icon: iconPendidikan})
+            .bindPopup("<b>SDN 3 Beraim</b>")
+            .addTo(pendidikanLayer);
+        var MTS_darul_ulum = L.marker([-8.703106, 116.342017], {icon: iconPendidikan})
+            .bindPopup("<b>MTS Darul Ulum Beraim</b>")
+            .addTo(pendidikanLayer);
+        var SMK_ALhasanain = L.marker([-8.704317, 116.338547], {icon: iconPendidikan})
+            .bindPopup("<b>SMK AL Hasanain</b>")
+            .addTo(pendidikanLayer);
+
+        // Layer group Fasilitas Ibadah
+        var ibadahLayer = L.layerGroup();
+        var masjid_beraim_lauk = L.marker([-8.709216, 116.340982], {icon: iconIbadah})
+            .bindPopup("<b>Masjid Beraim</b>")
+            .addTo(ibadahLayer);
+        var masjid_sendong = L.marker([-8.706522, 116.33588], {icon: iconIbadah})
+            .bindPopup("<b>Masjid Sendong</b>")
+            .addTo(ibadahLayer);
+        var masjid_petak = L.marker([-8.703214, 116.338423], {icon: iconIbadah})
+            .bindPopup("<b>Masjid Petak</b>")
+            .addTo(ibadahLayer);
+        var masjid_tanggor = L.marker([-8.700053, 116.345621], {icon: iconIbadah})
+            .bindPopup("<b>Masjid Tanggor</b>")
+            .addTo(ibadahLayer);
+
+        // Menambahkan kontrol layer
+        var baseMaps = {
+            "Peta Jalanan": osmLayer,
+            "Peta Satelit": satelliteLayer
+        };
+
+        var overlayMaps = {
+            "Batas Desa": BeraimBoundary, // Layer batas desa
+            "Kantor Desa": kantorDesaLayer,
+            "Fasilitas Pendidikan": pendidikanLayer,
+            "Fasilitas Ibadah": ibadahLayer
+        };
+
+        L.control.layers(baseMaps, overlayMaps).addTo(map);
+
+        // Menampilkan semua layer secara default
+        kantorDesaLayer.addTo(map);
+        pendidikanLayer.addTo(map);
+        ibadahLayer.addTo(map);
+        BeraimBoundary.addTo(map); // Pastikan batas desa ditampilkan
+
+        // Event klik pada peta
+        function onMapClick(e) {
+            alert("Anda mengklik peta di " + e.latlng);
+        }
+        map.on('click', onMapClick);
+    </script>
+</body>
+</html>
